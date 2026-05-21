@@ -1,34 +1,24 @@
-import os
 import gradio as gr
-from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
 
-# Load environment variables
-load_dotenv()
+from rag_chatbot import ask_question
 
-# Initialize LangChain model
-llm = ChatOpenAI(
-    model="openai/gpt-3.5-turbo",
-    api_key=os.getenv("OPENROUTER_API_KEY"),
-    base_url="https://openrouter.ai/api/v1"
-)
 
-# Chat function
-def chatbot_response(user_input):
+def chatbot_response(question):
 
-    # Generate response
-    response = llm.invoke(user_input)
+    answer = ask_question(question)
 
-    return response.content
+    return answer
 
-# Gradio interface
+
 interface = gr.Interface(
     fn=chatbot_response,
-    inputs="text",
+    inputs=gr.Textbox(
+        lines=2,
+        placeholder="Ask a question from your knowledge base..."
+    ),
     outputs="text",
-    title="AI Chatbot using LangChain",
-    description="Ask any question to the AI chatbot"
+    title="AI Knowledge Base Chatbot",
+    description="Ask questions from uploaded PDF documents."
 )
 
-# Launch app
 interface.launch()
