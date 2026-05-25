@@ -1,24 +1,19 @@
 import gradio as gr
 
-from rag_chatbot import ask_question
+from rag_chatbot_faiss import ask_question
 
 
-def chatbot_response(question):
+def respond(message, history):
 
-    answer = ask_question(question)
+    answer = ask_question(message)
 
     return answer
 
 
-interface = gr.Interface(
-    fn=chatbot_response,
-    inputs=gr.Textbox(
-        lines=2,
-        placeholder="Ask a question from your knowledge base..."
-    ),
-    outputs="text",
-    title="AI Knowledge Base Chatbot",
-    description="Ask questions from uploaded PDF documents."
+demo = gr.ChatInterface(
+    fn=respond,
+    title="📚 AI Knowledge Base Assistant",
+    description="Answers questions from locally stored PDF documents using FAISS Vector DB."
 )
 
-interface.launch()
+demo.launch()
