@@ -1,0 +1,9 @@
+QDRANT_HOST = "localhost"
+
+QDRANT_PORT = 6333
+
+COLLECTION_NAME = "knowledge_base"
+
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+TOP_K_RESULTS = 5

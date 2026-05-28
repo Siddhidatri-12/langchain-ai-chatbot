@@ -1,0 +1,11 @@
+QDRANT_HOST = "localhost"
+
+QDRANT_PORT = 6333
+
+COLLECTION_NAME = "knowledge_base"
+
+EMBEDDING_MODEL = "all-MiniLM-L6-v2"
+
+CHUNK_SIZE = 500
+
+CHUNK_OVERLAP = 50

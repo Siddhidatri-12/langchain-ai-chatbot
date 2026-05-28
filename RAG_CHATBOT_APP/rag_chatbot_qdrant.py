@@ -15,6 +15,13 @@ from langchain_openai import ChatOpenAI
 
 from query_classifier import identify_tag
 
+from constants import (
+    AGENT_PROMPT,
+    RAG_PROMPT
+)
+
+from config import *
+
 load_dotenv()
 
 # ------------------------
@@ -22,18 +29,16 @@ load_dotenv()
 # ------------------------
 
 client = QdrantClient(
-    host="localhost",
-    port=6333
+    host=QDRANT_HOST,
+    port=QDRANT_PORT
 )
-
-COLLECTION_NAME = "knowledge_base"
 
 # ------------------------
 # EMBEDDING MODEL
 # ------------------------
 
 embedding_model = SentenceTransformer(
-    "all-MiniLM-L6-v2"
+    EMBEDDING_MODEL
 )
 
 # ------------------------
@@ -89,11 +94,16 @@ def ask_question(question):
     # ------------------------
 
     results = client.query_points(
-    collection_name=COLLECTION_NAME,
-    query=query_vector,
-    query_filter=search_filter,
-    limit=5
-).points
+        collection_name=COLLECTION_NAME,
+        query=query_vector,
+        query_filter=search_filter,
+        limit=TOP_K_RESULTS
+    ).points
+
+    print(f"Results Found: {len(results)}")
+
+    for result in results:
+        print(result.payload)
 
     # ------------------------
     # STEP 5
@@ -113,27 +123,36 @@ def ask_question(question):
     )
 
     # ------------------------
+    # NO CONTEXT FOUND
+    # ------------------------
+
+    if not context.strip():
+
+        return "I don't know based on the knowledge base."
+
+    # ------------------------
     # STEP 6
     # FINAL PROMPT
     # ------------------------
 
-    prompt = f"""
-Answer ONLY from the provided context.
+    prompt = RAG_PROMPT.format(
+        context=context,
+        question=question
+    )
 
-If the answer is not present,
-reply:
+    final_prompt = f"""
+{AGENT_PROMPT}
 
-I don't know based on the knowledge base.
-
-Context:
-{context}
-
-Question:
-{question}
+{prompt}
 """
 
+    # ------------------------
+    # STEP 7
+    # GENERATE RESPONSE
+    # ------------------------
+
     response = llm.invoke(
-        prompt
+        final_prompt
     )
 
     return response.content

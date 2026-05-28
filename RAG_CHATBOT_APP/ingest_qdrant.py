@@ -61,7 +61,7 @@ splitter = RecursiveCharacterTextSplitter(
 # PROCESS PDFs
 # ----------------------------
 
-folder = "knowledge_base"
+folder = "../knowledge_base"
 
 points = []
 

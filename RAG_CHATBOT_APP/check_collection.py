@@ -9,4 +9,5 @@ info = client.get_collection(
     "knowledge_base"
 )
 
-print(info)
+print("\nVECTORS COUNT:")
+print(info.vectors_count)
