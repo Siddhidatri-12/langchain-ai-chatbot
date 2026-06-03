@@ -1,4 +1,4 @@
-from RAG_CHATBOT_APP.rag_chatbot_qdrant import ask_question
+from rag_chatbot_qdrant import ask_question
 
 question = input(
     "Ask Question: "

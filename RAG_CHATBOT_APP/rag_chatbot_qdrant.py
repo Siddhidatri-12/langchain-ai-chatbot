@@ -2,18 +2,9 @@ import os
 
 from dotenv import load_dotenv
 
-from qdrant_client import QdrantClient
-from qdrant_client.models import (
-    Filter,
-    FieldCondition,
-    MatchValue
-)
-
 from sentence_transformers import SentenceTransformer
-
+from qdrant_client import QdrantClient
 from langchain_openai import ChatOpenAI
-
-from query_classifier import identify_tag
 
 from constants import (
     AGENT_PROMPT,
@@ -55,16 +46,6 @@ llm = ChatOpenAI(
 def ask_question(question):
 
     # ------------------------
-    # STEP 1
-    # DETECT TAG
-    # ------------------------
-
-    tag = identify_tag(question)
-
-    print(f"Detected Tag: {tag}")
-
-    # ------------------------
-    # STEP 2
     # QUESTION EMBEDDING
     # ------------------------
 
@@ -73,40 +54,23 @@ def ask_question(question):
     ).tolist()
 
     # ------------------------
-    # STEP 3
-    # FILTER BY TAG
-    # ------------------------
-
-    search_filter = Filter(
-        must=[
-            FieldCondition(
-                key="tag",
-                match=MatchValue(
-                    value=tag
-                )
-            )
-        ]
-    )
-
-    # ------------------------
-    # STEP 4
     # SEARCH QDRANT
     # ------------------------
 
     results = client.query_points(
         collection_name=COLLECTION_NAME,
         query=query_vector,
-        query_filter=search_filter,
         limit=TOP_K_RESULTS
     ).points
 
-    print(f"Results Found: {len(results)}")
+    print("\n====================")
+    print("RESULTS FOUND:", len(results))
+    print("====================")
 
     for result in results:
         print(result.payload)
 
     # ------------------------
-    # STEP 5
     # BUILD CONTEXT
     # ------------------------
 
@@ -114,13 +78,20 @@ def ask_question(question):
 
     for result in results:
 
-        context_chunks.append(
-            result.payload["text"]
-        )
+        if result.payload and "text" in result.payload:
+
+            context_chunks.append(
+                result.payload["text"]
+            )
 
     context = "\n\n".join(
         context_chunks
     )
+
+    print("\n====================")
+    print("CONTEXT LENGTH:", len(context))
+    print("====================")
+    print(context[:1000])
 
     # ------------------------
     # NO CONTEXT FOUND
@@ -131,8 +102,7 @@ def ask_question(question):
         return "I don't know based on the knowledge base."
 
     # ------------------------
-    # STEP 6
-    # FINAL PROMPT
+    # PROMPT
     # ------------------------
 
     prompt = RAG_PROMPT.format(
@@ -147,8 +117,7 @@ def ask_question(question):
 """
 
     # ------------------------
-    # STEP 7
-    # GENERATE RESPONSE
+    # LLM RESPONSE
     # ------------------------
 
     response = llm.invoke(

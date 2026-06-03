@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 from langchain_openai import ChatOpenAI
 
-from RAG_CHATBOT_APP.constants import CLASSIFIER_PROMPT
+from constants import CLASSIFIER_PROMPT
 
 load_dotenv()
 

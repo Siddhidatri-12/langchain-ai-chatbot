@@ -1,20 +1,30 @@
 from qdrant_client import QdrantClient
 
-from pprint import pprint
-
 client = QdrantClient(
     host="localhost",
     port=6333
 )
 
-records = client.scroll(
+records, _ = client.scroll(
     collection_name="knowledge_base",
-    limit=10,
+    limit=1000,
     with_payload=True
 )
 
-for point in records[0]:
+sources = set()
 
-    print("\n====================\n")
+for point in records:
 
-    pprint(point.payload)
+    if point.payload:
+
+        source = point.payload.get("source")
+
+        if source:
+            sources.add(source)
+
+print("\nFILES FOUND IN QDRANT:\n")
+
+for source in sorted(sources):
+    print(source)
+
+print("\nTotal Files:", len(sources))

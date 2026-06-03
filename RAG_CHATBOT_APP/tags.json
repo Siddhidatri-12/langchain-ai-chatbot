@@ -1,13 +1,12 @@
 {
-    "ai": [
-        "AI.pdf"
-    ],
-
-    "machine_learning": [
-        "ML.pdf"
-    ],
-
-    "deep_learning": [
-        "DL.pdf"
+    "tags": [
+        "ai",
+        "machine_learning",
+        "deep_learning",
+        "H",
+        "Cloud",
+        "LLM",
+        "Cloup_comp",
+        "Health"
     ]
 }
